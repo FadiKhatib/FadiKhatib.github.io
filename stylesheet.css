@@ -129,3 +129,8 @@ name {
 span.highlight {
   background-color: #ffffd0;
 }
+
+/*fadi added*/
+li{
+  margin: 30px 0;
+}
