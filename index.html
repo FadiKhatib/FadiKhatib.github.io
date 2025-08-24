@@ -21,6 +21,90 @@
 	};
   </script>
 
+  <!-- Collaborator auto-linking: centralize names -> URLs -->
+  <script>
+    // Edit this map when you add collaborators; the content of the page can stay plain text.
+    const COLLAB_LINKS = new Map([
+      ["Yoni Kasten", "https://ykasten.github.io/"],
+      ["Meirav Galun", "https://www.weizmann.ac.il/math/meirav/"],
+      ["Ronen Basri", "https://www.weizmann.ac.il/math/ronen/home"],
+      ["Yuval Margalit", "https://www.linkedin.com/in/yuval-margalit-9688431b7/"],
+      ["Dror Moran", "https://scholar.google.com/citations?user=kS5jfSoAAAAJ&hl=en"],
+      ["Guy Trostianetsky", "https://scholar.google.com/citations?user=Jp8GUPYAAAAJ&hl=en"],
+      ["Rachel Kolodny", "https://www.cs.haifa.ac.il/~trachel/contact.html"],
+      ["Hagit Hel-Or", "https://chb.hevra.haifa.ac.il/"]
+    ]);
+
+    // Utility to walk text nodes and replace collaborator name occurrences with <a> tags.
+    // Leaves existing <a> content intact and preserves comments/scripts/styles.
+    document.addEventListener("DOMContentLoaded", () => {
+      const SKIP_TAGS = new Set(["A", "SCRIPT", "STYLE", "TEXTAREA", "CODE", "PRE", "NOSCRIPT"]);
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          // Skip empty/whitespace-only nodes or nodes inside disallowed parents
+          if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+          let p = node.parentNode;
+          while (p) {
+            if (SKIP_TAGS.has(p.nodeName)) return NodeFilter.FILTER_REJECT;
+            p = p.parentNode;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+
+      const names = Array.from(COLLAB_LINKS.keys())
+        // Sort by length to avoid partial replacement of longer names by shorter overlaps
+        .sort((a, b) => b.length - a.length);
+
+      const toProcess = [];
+      let n;
+      while ((n = walker.nextNode())) toProcess.push(n);
+
+      for (const textNode of toProcess) {
+        let text = textNode.nodeValue;
+        let changed = false;
+
+        const frag = document.createDocumentFragment();
+        let cursor = 0;
+
+        // Build a combined regex of all names with word boundaries; escape special chars.
+        const escapedNames = names.map(nm => nm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        if (escapedNames.length === 0) continue;
+        const re = new RegExp("\\b(" + escapedNames.join("|") + ")\\b", "g");
+
+        let match;
+        while ((match = re.exec(text)) !== null) {
+          const name = match[0];
+          const start = match.index;
+
+          // Append preceding text
+          if (start > cursor) {
+            frag.appendChild(document.createTextNode(text.slice(cursor, start)));
+          }
+
+          // Create link
+          const a = document.createElement("a");
+          a.textContent = name;
+          a.href = COLLAB_LINKS.get(name) || "#";
+          a.target = "_blank";
+          a.rel = "noopener";
+          frag.appendChild(a);
+
+          cursor = re.lastIndex;
+          changed = true;
+        }
+
+        if (changed) {
+          // Append remaining text
+          if (cursor < text.length) {
+            frag.appendChild(document.createTextNode(text.slice(cursor)));
+          }
+          textNode.parentNode.replaceChild(frag, textNode);
+        }
+      }
+    });
+  </script>
+  <!-- /Collaborator auto-linking -->
 </head>
 
 <body>
@@ -34,16 +118,24 @@
                 <name>Fadi Khatib</name>
               </p>
 
-              <p>
-                I am a Ph.D. candidate in the Department of Computer Science and Applied Mathematics at the <a href="https://www.weizmann.ac.il/pages/">Weizmann Institute of Science</a> under the supervision of <a href="https://www.weizmann.ac.il/math/ronen/home"> Prof. Ronen Basri.</a>
-              </p>
-              <p>
-                  I received my B.Sc in Computer Science at the age of 18 from the University of Haifa through the <a href="https://cs.hevra.haifa.ac.il/index.php/information-for-registrants-he/challenge-program">Challenge program</a>, which is designed for exceptional high school students.
-              </p>
-                <p>
-                    My main research interest lies in developing deep learning methods for 3D reconstruction, Structure-from-motion, and visual localization tasks.
-<!--                    My research interests lie at the intersection of computer vision, computer graphics, and machine learning. Through my research, I want to make it easier for computers and machines to understand and capture the dynamic 3D world we live in from images and videos.-->
-                </p>
+            <p>
+            I am a direct-track Ph.D. candidate in the Department of Computer Science and Applied Mathematics at the
+            <a href="https://www.weizmann.ac.il/pages/">Weizmann Institute of Science</a> under the supervision of
+            <a href="https://www.weizmann.ac.il/math/ronen/home"> Prof. Ronen Basri.</a>
+            </p>
+            <p>
+            I completed my M.Sc. at the Weizmann Institute of Science.
+            Prior to that, I received my B.Sc. in Computer Science at the age of 18 from the University of Haifa through the
+            <a href="https://cs.hevra.haifa.ac.il/index.php/information-for-registrants-he/challenge-program">Challenge program</a>,
+            which is designed for exceptional high school students.
+            </p>
+            <p>
+            My main research interest lies in developing deep learning methods for 3D reconstruction, Structure-from-Motion,
+            and visual localization tasks. Recently, I have also become interested in Vision-Language Models (VLMs).
+            <!-- My research interests lie at the intersection of computer vision, computer graphics, and machine learning.
+             Through my research, I want to make it easier for computers and machines to understand and capture the
+             dynamic 3D world we live in from images and videos. -->
+            </p>
 
 
 
@@ -75,14 +167,52 @@
         </tbody></table>
         <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
 
+                <tr>
+            <td style="padding:20px;width:25%;vertical-align:middle">
+              <img src="images/coming_soon.png" alt="clean-usnob" width="160" height="160">
+            </td>
+<!--            <script type="text/javascript">-->
+<!--					var bibtex_RESFM = "@misc{khatib2024resfm,\n title={RESFM: Robust Equivariant Multiview Structure from Motion},\n author={Fadi Khatib and Yoni Kasten and Dror Moran and Meirav Galun and Ronen Basri},\n year={2024},\n eprint={2404.14280},\n archivePrefix={arXiv},\n primaryClass={cs.CV}\n }"-->
+<!--              </script>-->
+            <td width="75%" valign="middle">
+              <a href="https://robust-equivariant-sfm.github.io/">
+                <papertitle>Generalizable Visual Localization for Gaussian Splatting Scene Representations</papertitle>
+              </a>
+              <br>
+              <strong>Fadi Khatib*</strong>, Dror Moran*, Guy Trostianetsky, <a href="https://ykasten.github.io/">Yoni Kasten</a>, <a href="https://www.weizmann.ac.il/math/meirav/">Meirav Galun</a>, <a href="https://www.weizmann.ac.il/math/ronen/home">Ronen Basri</a>
+              <br>
+              <em>ICCVW 2025</em>
+              <br>
+              <div class="btn-group">
+<!--				<button onclick=copyToClipboard(bibtex_grelpose)>BibTeX</button> /-->
+<!--				<a href="https://arxiv.org/abs/2404.14280">ArXiv</a> /-->
+                  <a>Coming Soon</a>
+<!--				<a href="https://robust-equivariant-sfm.github.io/">Project Page </a>-->
+              </div>
+<!--              <p>We present a robust solver based on permutation equivariant architecture for the-->
+<!--                    structure from motion problem. Our proposed method can cope with a point-->
+<!--                    track tensor contaminated with many outliers. In addition, we modified the-->
+<!--                    bundle adjustment module to make it robust enough to handle classification-->
+<!--                    errors. Our method achieves high accuracy while reducing the time significantly-->
+<!--                    compared to classical methods.-->
+<!--              </p>-->
+            </td>
+          </tr>
+
+
 
         <tr>
             <td style="padding:20px;width:25%;vertical-align:middle">
               <img src="images/RESFM_gif.gif" alt="clean-usnob" width="160" height="160">
             </td>
             <script type="text/javascript">
-					var bibtex_RESFM = "@misc{khatib2024resfm,\n title={RESFM: Robust Equivariant Multiview Structure from Motion},\n author={Fadi Khatib and Yoni Kasten and Dror Moran and Meirav Galun and Ronen Basri},\n year={2024},\n eprint={2404.14280},\n archivePrefix={arXiv},\n primaryClass={cs.CV}\n }"
-              </script>
+              var bibtex_RESFM = "@inproceedings{khatib2025resfm,\n" +
+            "  title={Resfm: Robust deep equivariant structure from motion},\n" +
+            "  author={Khatib, Fadi and Kasten, Yoni and Moran, Dror and Galun, Meirav and Basri, Ronen},\n" +
+            "  booktitle={The Thirteenth International Conference on Learning Representations},\n" +
+            "  year={2025}\n" +
+            "}";
+            </script>
             <td width="75%" valign="middle">
               <a href="https://robust-equivariant-sfm.github.io/">
                 <papertitle>RESFM: Robust Equivariant Multiview Structure from Motion</papertitle>
@@ -93,7 +223,7 @@
               <em>ICLR 2025</em>
               <br>
               <div class="btn-group">
-				<button onclick=copyToClipboard(bibtex_grelpose)>BibTeX</button> /
+				<button onclick=copyToClipboard(bibtex_RESFM)>BibTeX</button> /
 				<a href="https://arxiv.org/abs/2404.14280">ArXiv</a> /
 				<a href="https://robust-equivariant-sfm.github.io/">Project Page </a>
               </div>
@@ -110,11 +240,19 @@
 
                 <tr>
             <td style="padding:20px;width:25%;vertical-align:middle">
-<!--              <img src="images/RESFM_gif.gif" alt="clean-usnob" width="160" height="160">-->
+              <img src="images/NACNet_NeurIPS_2024.png" alt="clean-usnob" width="160" height="160">
             </td>
             <script type="text/javascript">
-					var bibtex_RESFM = ""
-              </script>
+              var bibtex_nacnet = "@article{moran2024consensus,\n" +
+            "  title={Consensus learning with deep sets for essential matrix estimation},\n" +
+            "  author={Moran, Dror and Margalit, Yuval and Trostianetsky, Guy and Khatib, Fadi and Galun, Meirav and Basri, Ronen},\n" +
+            "  journal={Advances in Neural Information Processing Systems},\n" +
+            "  volume={37},\n" +
+            "  pages={101529--101551},\n" +
+            "  year={2024}\n" +
+            "}";
+            </script>
+
             <td width="75%" valign="middle">
               <papertitle>Consensus Learning with Deep Sets for Essential Matrix Estimation</papertitle>
               <br>
@@ -123,9 +261,9 @@
               <em>NeurIPS 2024</em>
               <br>
               <div class="btn-group">
-<!--				<button onclick=copyToClipboard(bibtex_grelpose)>BibTeX</button> /-->
-				<a href="https://arxiv.org/abs/2406.17414">ArXiv</a>
-<!--				<a href="https://robust-equivariant-sfm.github.io/">Project Page </a>-->
+				<button onclick=copyToClipboard(bibtex_nacnet)>BibTeX</button> /
+				<a href="https://arxiv.org/abs/2406.17414">ArXiv</a> /
+				<a href="https://github.com/drormoran/NACNet/">Code</a>
               </div>
               <p>We present NACNet, a Noise-Aware Deep Sets framework to estimate relative camera pose, given
                 a set of putative matches extracted from two views of a scene. We demonstrate that a position
