@@ -2,3 +2,7 @@
 images_old/
 data_old/
 
+Thumbs.db
+.idea/
+*.swp
+.swp

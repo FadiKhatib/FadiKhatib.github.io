@@ -162,3 +162,42 @@ hr{
 
 
 
+/* dark mode: follows the visitor's system setting */
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #16181d;
+    color: #e3e3e3;
+  }
+
+  a {
+    color: #6cb0ff;
+  }
+
+  a:focus,
+  a:hover {
+    color: #f5a54a;
+  }
+
+  hr {
+    border-top-color: #33363d;
+  }
+
+  span.highlight {
+    background-color: #4a4a20;
+  }
+
+  /* the Weizmann logo is dark-on-transparent */
+  img[src$="WIS_logo1.svg"] {
+    background-color: #ffffff;
+    border-radius: 8px;
+  }
+}
